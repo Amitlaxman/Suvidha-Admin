@@ -25,10 +25,13 @@ export const getIssues = async (department?: Department): Promise<Issue[]> => {
       id: doc.id,
       ...data,
       createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
-      updates: data.updates.map((update: any) => ({
-        ...update,
-        date: (update.date as Timestamp).toDate().toISOString(),
-      })),
+      updates: data.updates.map((update: any) => {
+        const date = update.date.toDate ? (update.date as Timestamp).toDate().toISOString() : update.date;
+        return {
+          ...update,
+          date: date,
+        }
+      }),
     } as Issue);
   });
   return issues;
@@ -47,10 +50,13 @@ export const getIssueById = async (id: string): Promise<Issue | undefined> => {
         id: issueSnapshot.id,
         ...data,
         createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
-        updates: data.updates.map((update: any) => ({
+        updates: data.updates.map((update: any) => {
+          const date = update.date.toDate ? (update.date as Timestamp).toDate().toISOString() : update.date;
+          return {
             ...update,
-            date: (update.date as Timestamp).toDate().toISOString(),
-        })),
+            date: date,
+          }
+        }),
     } as Issue;
 }
 
@@ -117,3 +123,4 @@ export const reassignIssueDepartment = async (
     }
     return updatedIssue;
 };
+
