@@ -1,3 +1,5 @@
+import { Timestamp } from 'firebase/firestore';
+
 export type Department =
   | 'Roads'
   | 'Electricity'
@@ -63,4 +65,25 @@ export interface Issue {
   isAnonymous: boolean;
   imageUrl: string;
   updates: IssueUpdate[];
+}
+
+export interface FirestoreIssue {
+    id: string;
+    title: string;
+    description: string;
+    category: IssueCategory;
+    severity: IssueSeverity;
+    location: string;
+    author: string;
+    authorId: string;
+    createdAt: Timestamp;
+    status: IssueStatus;
+    upvotes: number;
+    isAnonymous: boolean;
+    imageUrl: string;
+    updates: {
+        date: Timestamp;
+        description: string;
+        status: IssueStatus;
+    }[];
 }

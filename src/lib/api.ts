@@ -1,29 +1,57 @@
-import { mockIssues } from './mock-data';
+import { db } from './firebase';
+import { collection, getDocs, doc, getDoc, updateDoc, query, where, addDoc, Timestamp } from 'firebase/firestore';
 import { Issue, Department, IssueUpdate, IssueStatus } from './types';
 
-let issues: Issue[] = [...mockIssues];
-
 export const getIssues = async (department?: Department): Promise<Issue[]> => {
-  await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+  const issuesCollection = collection(db, 'issues');
+  let q = query(issuesCollection);
 
-  if (!department || department === 'Central Admin') {
-    return issues;
+  if (department && department !== 'Central Admin') {
+    const categoryMap: Record<string, string> = {
+      'Roads': 'Pothole',
+      'Electricity': 'Street Light Outage',
+      'Waste Management': 'Waste',
+      'Public Transport': 'Bus Delay'
+    };
+    const relevantCategory = categoryMap[department];
+    q = query(issuesCollection, where('category', '==', relevantCategory));
   }
   
-  const categoryMap: Record<string, string> = {
-    'Roads': 'Pothole',
-    'Electricity': 'Street Light Outage',
-    'Waste Management': 'Waste',
-    'Public Transport': 'Bus Delay'
-  };
-
-  const relevantCategory = categoryMap[department];
-  return issues.filter(issue => issue.category === relevantCategory);
+  const issueSnapshot = await getDocs(q);
+  const issues: Issue[] = [];
+  issueSnapshot.forEach((doc) => {
+    const data = doc.data();
+    issues.push({
+      id: doc.id,
+      ...data,
+      createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
+      updates: data.updates.map((update: any) => ({
+        ...update,
+        date: (update.date as Timestamp).toDate().toISOString(),
+      })),
+    } as Issue);
+  });
+  return issues;
 };
 
 export const getIssueById = async (id: string): Promise<Issue | undefined> => {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return issues.find(issue => issue.id === id);
+    const issueDoc = doc(db, 'issues', id);
+    const issueSnapshot = await getDoc(issueDoc);
+
+    if (!issueSnapshot.exists()) {
+        return undefined;
+    }
+
+    const data = issueSnapshot.data();
+    return {
+        id: issueSnapshot.id,
+        ...data,
+        createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
+        updates: data.updates.map((update: any) => ({
+            ...update,
+            date: (update.date as Timestamp).toDate().toISOString(),
+        })),
+    } as Issue;
 }
 
 export const updateIssueStatus = async (
@@ -31,12 +59,14 @@ export const updateIssueStatus = async (
   status: IssueStatus,
   updateDescription: string
 ): Promise<Issue> => {
-  await new Promise(resolve => setTimeout(resolve, 700));
-  
-  const issueIndex = issues.findIndex(i => i.id === issueId);
-  if (issueIndex === -1) {
+  const issueRef = doc(db, 'issues', issueId);
+  const issueSnap = await getDoc(issueRef);
+
+  if (!issueSnap.exists()) {
     throw new Error('Issue not found');
   }
+
+  const issueData = issueSnap.data();
 
   const newUpdate: IssueUpdate = {
     date: new Date().toISOString(),
@@ -44,13 +74,21 @@ export const updateIssueStatus = async (
     status: status,
   };
 
-  const updatedIssue = {
-    ...issues[issueIndex],
-    status: status,
-    updates: [...issues[issueIndex].updates, newUpdate],
-  };
+  const currentUpdates = issueData.updates || [];
 
-  issues[issueIndex] = updatedIssue;
+  await updateDoc(issueRef, {
+    status: status,
+    updates: [...currentUpdates, {
+      date: Timestamp.fromDate(new Date(newUpdate.date)),
+      description: newUpdate.description,
+      status: newUpdate.status,
+    }],
+  });
+  
+  const updatedIssue = await getIssueById(issueId);
+  if (!updatedIssue) {
+    throw new Error('Failed to retrieve updated issue');
+  }
   return updatedIssue;
 };
 
@@ -58,27 +96,24 @@ export const reassignIssueDepartment = async (
     issueId: string,
     newDepartment: Department
 ): Promise<Issue> => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
     const categoryMap: Record<string, any> = {
         'Roads': 'Pothole',
         'Electricity': 'Street Light Outage',
         'Waste Management': 'Waste',
         'Public Transport': 'Bus Delay',
-        'Central Admin': 'Pothole'
     };
 
     const newCategory = categoryMap[newDepartment];
-    const issueIndex = issues.findIndex(i => i.id === issueId);
-    if (issueIndex === -1) {
-        throw new Error('Issue not found');
+    if (!newCategory) {
+        throw new Error('Invalid department for reassignment');
     }
+    
+    const issueRef = doc(db, 'issues', issueId);
+    await updateDoc(issueRef, { category: newCategory });
 
-    const updatedIssue = {
-        ...issues[issueIndex],
-        category: newCategory,
-    };
-
-    issues[issueIndex] = updatedIssue;
+    const updatedIssue = await getIssueById(issueId);
+    if (!updatedIssue) {
+        throw new Error('Failed to retrieve updated issue');
+    }
     return updatedIssue;
 };
