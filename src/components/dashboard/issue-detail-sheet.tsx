@@ -227,16 +227,18 @@ export function IssueDetailSheet({
                 </h3>
                 <p className="text-muted-foreground">{issue.location}</p>
             </div>
-
-            <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
-              <Image
-                src={issue.imageUrl}
-                alt={issue.title}
-                fill
-                className="object-cover"
-                data-ai-hint="urban problem"
-              />
-            </div>
+            
+            {issue.imageUrl && (
+              <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
+                <Image
+                  src={issue.imageUrl}
+                  alt={issue.title}
+                  fill
+                  className="object-cover"
+                  data-ai-hint="urban problem"
+                />
+              </div>
+            )}
             
             <Card>
               <CardHeader>
