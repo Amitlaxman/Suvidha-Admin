@@ -279,12 +279,12 @@ export function IssueDetailSheet({
                         )}
                       </div>
                       <div>
-                        <p className="font-semibold">
+                        <div className="font-semibold">
                           Status changed to{' '}
                           <Badge className={statusColors[update.status]}>
                             {update.status}
                           </Badge>
-                        </p>
+                        </div>
                         <p className="text-sm text-muted-foreground">
                           {formatDate(update.date)}
                         </p>
