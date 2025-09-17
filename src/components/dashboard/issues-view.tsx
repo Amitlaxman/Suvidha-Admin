@@ -52,7 +52,7 @@ export function IssuesView({ isDepartmentView = false }: { isDepartmentView?: bo
           case 'oldest':
             return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
           case 'severity':
-            const severityOrder = { Critical: 4, High: 3, Medium: 2, Low: 1 };
+            const severityOrder = { High: 3, Medium: 2, Low: 1 };
             return severityOrder[b.severity] - severityOrder[a.severity];
           case 'upvotes':
             return b.upvotes - a.upvotes;
@@ -90,9 +90,9 @@ export function IssuesView({ isDepartmentView = false }: { isDepartmentView?: bo
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="Reported">Reported</SelectItem>
+            <SelectItem value="Submitted">Submitted</SelectItem>
             <SelectItem value="Acknowledged">Acknowledged</SelectItem>
-            <SelectItem value="In-Progress">In-Progress</SelectItem>
+            <SelectItem value="In Progress">In Progress</SelectItem>
             <SelectItem value="Resolved">Resolved</SelectItem>
             <SelectItem value="Irrelevant">Irrelevant</SelectItem>
           </SelectContent>

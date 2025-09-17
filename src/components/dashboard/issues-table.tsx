@@ -21,9 +21,9 @@ interface IssuesTableProps {
 }
 
 const statusColors: Record<IssueStatus, string> = {
-  Reported: 'bg-gray-500',
+  Submitted: 'bg-gray-500',
   Acknowledged: 'bg-blue-500',
-  'In-Progress': 'bg-yellow-500 text-black',
+  'In Progress': 'bg-yellow-500 text-black',
   Resolved: 'bg-green-500',
   Irrelevant: 'bg-red-500',
 };
@@ -32,7 +32,6 @@ const severityColors: Record<IssueSeverity, string> = {
     Low: 'border-green-500 text-green-500',
     Medium: 'border-yellow-500 text-yellow-500',
     High: 'border-orange-500 text-orange-500',
-    Critical: 'border-red-500 text-red-500',
 }
 
 export function IssuesTable({ issues, isLoading, onRowClick }: IssuesTableProps) {

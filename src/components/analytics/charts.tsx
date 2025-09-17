@@ -8,17 +8,18 @@ const chartConfig = {
   issues: {
     label: 'Issues',
   },
-  'Pothole': { label: 'Pothole', color: 'hsl(var(--chart-1))' },
-  'Street Light Outage': { label: 'Street Light', color: 'hsl(var(--chart-2))' },
-  'Waste': { label: 'Waste', color: 'hsl(var(--chart-3))' },
-  'Bus Delay': { label: 'Bus Delay', color: 'hsl(var(--chart-4))' },
+  'Roads': { label: 'Roads', color: 'hsl(var(--chart-1))' },
+  'Water Supply': { label: 'Water Supply', color: 'hsl(var(--chart-5))' },
+  'Electricity': { label: 'Electricity', color: 'hsl(var(--chart-2))' },
+  'Waste Management': { label: 'Waste', color: 'hsl(var(--chart-3))' },
+  'Public Transport': { label: 'Transport', color: 'hsl(var(--chart-4))' },
+  'Other': { label: 'Other', color: 'hsl(var(--muted))' },
   'Low': { label: 'Low', color: 'hsl(var(--chart-1))' },
   'Medium': { label: 'Medium', color: 'hsl(var(--chart-2))' },
   'High': { label: 'High', color: 'hsl(var(--chart-3))' },
-  'Critical': { label: 'Critical', color: 'hsl(var(--chart-4))' },
 };
 
-const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))'];
+const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
 
 
 export function AnalyticsCharts({ data }: { data: any }) {

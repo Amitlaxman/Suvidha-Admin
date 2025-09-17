@@ -5,6 +5,8 @@ export type Department =
   | 'Electricity'
   | 'Waste Management'
   | 'Public Transport'
+  | 'Water Supply'
+  | 'Other'
   | 'Central Admin';
 
 export const Departments: Department[] = [
@@ -12,6 +14,8 @@ export const Departments: Department[] = [
   'Electricity',
   'Waste Management',
   'Public Transport',
+  'Water Supply',
+  'Other',
   'Central Admin',
 ];
 
@@ -21,6 +25,9 @@ export const DepartmentEmails: Record<string, Department> = {
   'admin@wastemanagement.com': 'Waste Management',
   'admin@publictransport.com': 'Public Transport',
   'admin@central.com': 'Central Admin',
+  // Assuming new departments might have admin emails
+  'admin@watersupply.com': 'Water Supply',
+  'admin@other.com': 'Other',
 };
 
 export interface AdminUser {
@@ -31,18 +38,21 @@ export interface AdminUser {
 }
 
 export type IssueStatus =
-  | 'Reported'
+  | 'Submitted'
   | 'Acknowledged'
-  | 'In-Progress'
+  | 'In Progress'
   | 'Resolved'
-  | 'Irrelevant';
+  | 'Irrelevant'; // 'Irrelevant' is from the admin app, not in the provided schema, but useful.
 
-export type IssueSeverity = 'Low' | 'Medium' | 'High' | 'Critical';
+export type IssueSeverity = 'Low' | 'Medium' | 'High';
+
 export type IssueCategory =
-  | 'Pothole'
-  | 'Street Light Outage'
-  | 'Waste'
-  | 'Bus Delay';
+  | 'Roads'
+  | 'Water Supply'
+  | 'Electricity'
+  | 'Waste Management'
+  | 'Public Transport'
+  | 'Other';
 
 export interface IssueUpdate {
   date: string; // ISO 8601 format
@@ -56,14 +66,15 @@ export interface Issue {
   description: string;
   category: IssueCategory;
   severity: IssueSeverity;
-  location: string; // e.g., "lat,lng"
+  location: string; // e.g., "lat,lng" or address
   author: string;
   authorId: string;
   createdAt: string; // ISO 8601 format
   status: IssueStatus;
   upvotes: number;
   isAnonymous: boolean;
-  imageUrl: string;
+  imageUrl?: string;
+  mediaDataUri?: string;
   updates: IssueUpdate[];
 }
 
@@ -80,7 +91,8 @@ export interface FirestoreIssue {
     status: IssueStatus;
     upvotes: number;
     isAnonymous: boolean;
-    imageUrl: string;
+    imageUrl?: string;
+    mediaDataUri?: string;
     updates: {
         date: Timestamp;
         description: string;

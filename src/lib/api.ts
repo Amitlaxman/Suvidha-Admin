@@ -1,20 +1,14 @@
 import { db } from './firebase';
 import { collection, getDocs, doc, getDoc, updateDoc, query, where, addDoc, Timestamp } from 'firebase/firestore';
-import { Issue, Department, IssueUpdate, IssueStatus } from './types';
+import { Issue, Department, IssueUpdate, IssueStatus, IssueCategory } from './types';
 
 export const getIssues = async (department?: Department): Promise<Issue[]> => {
   const issuesCollection = collection(db, 'issues');
   let q = query(issuesCollection);
 
   if (department && department !== 'Central Admin') {
-    const categoryMap: Record<string, string> = {
-      'Roads': 'Pothole',
-      'Electricity': 'Street Light Outage',
-      'Waste Management': 'Waste',
-      'Public Transport': 'Bus Delay'
-    };
-    const relevantCategory = categoryMap[department];
-    q = query(issuesCollection, where('category', '==', relevantCategory));
+    // The department in the admin app maps directly to the category in the Sudhaaro app
+    q = query(issuesCollection, where('category', '==', department));
   }
   
   const issueSnapshot = await getDocs(q);
@@ -102,15 +96,10 @@ export const reassignIssueDepartment = async (
     issueId: string,
     newDepartment: Department
 ): Promise<Issue> => {
-    const categoryMap: Record<string, any> = {
-        'Roads': 'Pothole',
-        'Electricity': 'Street Light Outage',
-        'Waste Management': 'Waste',
-        'Public Transport': 'Bus Delay',
-    };
-
-    const newCategory = categoryMap[newDepartment];
-    if (!newCategory) {
+    // In the new schema, the "Department" is the "Category".
+    const newCategory = newDepartment as IssueCategory;
+    
+    if (!newCategory || newDepartment === 'Central Admin') {
         throw new Error('Invalid department for reassignment');
     }
     
@@ -123,4 +112,3 @@ export const reassignIssueDepartment = async (
     }
     return updatedIssue;
 };
-
